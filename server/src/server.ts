@@ -1,8 +1,15 @@
-import express,{ Express } from "express";
+import express,{ Express, Request, Response } from "express";
+import mongoose from "mongoose"
+import "dotenv/config"
 
 
 const app = express();
 
-app.listen(8000, () => {
+const port = process.env.PORT
+
+mongoose.connect(process.env.MONGO_URI as string).then(() => {
+console.log("db conneted")
+app.listen(port, () => {
     console.log("server running")
+})
 })

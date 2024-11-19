@@ -19,6 +19,7 @@ app.use(morgan("dev"))
 
 app.use("/api", userRouter)
 
+
 const port = process.env.PORT
 
 mongoose.connect(process.env.MONGO_URI as string).then(() => {

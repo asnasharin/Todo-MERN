@@ -1,8 +1,11 @@
+import Sidebar from "../../components/Sidebar/Sidebar"
 
 
 function HomePage() {
   return (
-    <div>HomePage</div>
+    <div>
+      <Sidebar />
+    </div>
   )
 }
 

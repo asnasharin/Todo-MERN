@@ -25,7 +25,6 @@ const authSlice = createSlice({
             localStorage.removeItem("user");
             localStorage.removeItem("token");
             localStorage.removeItem("todos");
-            window.location.reload();
           },
           reset: (state) => {
             state.isError = false;

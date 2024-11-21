@@ -4,8 +4,8 @@ import { createTodo, deleteTodo, editTodo, getTodo, updateTodo } from "../contro
 
 const route: Router = Router()
 
-route.post("/", protect, createTodo)
-.get("/", protect, getTodo)
+route.post("/todo", protect, createTodo)
+route.get("/todo", protect, getTodo)
 
 route
    .route("/:id")

@@ -3,6 +3,7 @@ import mongoose from "mongoose"
 import cors from "cors"
 import morgan from "morgan"
 import userRouter from "../src/routes/userRoutes"
+import todoRouter from "../src/routes/todoRoutes"
 import "dotenv/config"
 
 
@@ -17,7 +18,9 @@ app.use(express.urlencoded({ extended: true}))
 app.use(cors(corsConfig))
 app.use(morgan("dev"))
 
-app.use("/api", userRouter)
+app.use("/api", userRouter, todoRouter)
+// app.use("/api/todo", todoRouter)
+
 
 const port = process.env.PORT
 

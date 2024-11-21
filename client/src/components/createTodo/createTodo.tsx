@@ -2,9 +2,9 @@ import { Modal } from "flowbite-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { ITodo } from "../../types/todoTypes";
 import { validate } from "../../utils/validate";
-import { toast } from "react-toastify";
-import { CreateTodo } from "../../services/todoServices";
-
+import toast from "react-hot-toast";
+import { CreateTodo, getAllMyTodos } from "../../services/todoServices";
+import { useAppDispatch } from "../../store/store";
 
 type Prop = {
   openModal: boolean;
@@ -12,57 +12,57 @@ type Prop = {
 };
 export default function CreateTodoModal({ openModal, setOpenModal }: Prop) {
   const [submit, setSubmit] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
   const [formData, setFormData] = useState<ITodo>({
     title: "",
     description: "",
     dueDate: "",
-    priority: ""
+    priority: "",
   });
 
-  const [formError, setFormError] = useState({
+  const [formError, setFormError] = useState<ITodo>({
     title: "",
     description: "",
     dueDate: "",
-    priority: ""
-  })
-
-
-  const onchange = (e: React.ChangeEvent<HTMLInputElement | 
-    HTMLTextAreaElement | HTMLSelectElement >
+    priority: "",
+  });
+  const onchange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
-    const { name, value } = e.target
-
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
-    })
+      [name]: value,
+    });
 
     if (formData.title) {
       setFormError({
         ...formError,
-        title: validate("required", formData.title)
-      })
+        title: validate("required", formData.title),
+      });
     }
-      if (formData.description) {
-        setFormError({
-          ...formError,
-          description: validate("required", formData.description)
-        })
-      }
-      if (formData.dueDate) {
+    if (formData.description) {
       setFormError({
         ...formError,
-        dueDate: validate("required", formData.dueDate)
-      })
-     }
-      if (formData.priority) {
-        setFormError({
-          ...formError,
-          priority: validate("required", formData.priority)
-      })
+        description: validate("required", formData.description),
+      });
     }
-    setSubmit(false) 
-  }
+    if (formData.dueDate) {
+      setFormError({
+        ...formError,
+        dueDate: validate("required", formData.dueDate),
+      });
+    }
+    if (formData.priority) {
+      setFormError({
+        ...formError,
+        priority: validate("required", formData.priority),
+      });
+    }
+    setSubmit(false);
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -71,50 +71,22 @@ export default function CreateTodoModal({ openModal, setOpenModal }: Prop) {
       title: validate("required", formData.title),
       description: validate("required", formData.description),
       dueDate: validate("required", formData.dueDate),
-      priority: validate("required", formData.priority)
-    })
-    setSubmit(true)
-  }
+      priority: validate("required", formData.priority),
+    });
+
+    setSubmit(true);
+  };
 
   useEffect(() => {
     if (
-      (formError.title && submit) ||
       (formError.description && submit) ||
-      (formError.priority && submit) ||
-      (formError.dueDate && submit) 
+      (formError.title && submit) ||
+      (formError.dueDate && submit) ||
+      (formError.priority && submit)
     ) {
-      toast.error("fields are missing")
+      toast.error("Some filed are missing");
     }
-  }, [formError, submit])
-
-  // useEffect(() => {
-  //   (async function() {
-  //     if (
-  //     submit &&
-  //     formData.title &&
-  //     formData.description &&
-  //     formData.dueDate &&
-  //     formData.priority &&
-  //     !formError.title &&
-  //     !formError.description &&
-  //     !formError.dueDate &&
-  //     !formError.priority 
-  //     ) {
-  //       const data = await CreateTodo(formData)
-  //       if (data) {
-  //         toast.success("Todo created")
-  //         setFormData({
-  //           description: "",
-  //           title: "",
-  //           dueDate: "",
-  //           priority: ""
-  //         });
-  //         setOpenModal(false)
-          
-  //       }
-  //     }
-  //   })
-  // }, [submit, formData, formError, setOpenModal])
+  }, [formError, submit]);
 
   useEffect(() => {
     (async function () {
@@ -139,12 +111,11 @@ export default function CreateTodoModal({ openModal, setOpenModal }: Prop) {
             priority: "",
           });
           setOpenModal(false);
-          // dispatch(getAllMytodos());
+          dispatch(getAllMyTodos());
         }
       }
     })();
-  }, [submit, formData, formError, setOpenModal]);
-
+  }, [submit, formData, formError, setOpenModal, dispatch]);
 
   return (
     <Modal
@@ -167,15 +138,18 @@ export default function CreateTodoModal({ openModal, setOpenModal }: Prop) {
     >
       <Modal.Header>Edit Todo</Modal.Header>
       <Modal.Body>
-        <form  onSubmit={handleSubmit} className="grid gap-2 grid-cols-2">
+        <form onSubmit={handleSubmit} className="grid gap-2 grid-cols-2">
           <div className="col-span-2 gap-2 flex flex-col">
             <label className="dark:text-gray-200" htmlFor="title">
               Title
             </label>
             <input
-            onChange={onchange}
-            value={formData.title}
+              onChange={onchange}
+              value={formData.title}
               name="title"
+              className={`rounded ${
+                formError.title && "ring-1 ring-red-600"
+              } dark:text-gray-200 dark:bg-gray-800 col-span-2`}
               type="text"
               placeholder="Title of the todo"
             />
@@ -185,9 +159,12 @@ export default function CreateTodoModal({ openModal, setOpenModal }: Prop) {
               Due Date
             </label>
             <input
-            onChange={onchange}
-            value={formData.dueDate}
               name="dueDate"
+              onChange={onchange}
+              value={formData.dueDate}
+              className={`rounded ${
+                formError.dueDate && "ring-1 ring-red-600"
+              } dark:text-gray-200 dark:bg-gray-800 md:col-span-1 col-span-2`}
               type="date"
             />
           </div>
@@ -199,6 +176,9 @@ export default function CreateTodoModal({ openModal, setOpenModal }: Prop) {
               name="priority"
               onChange={onchange}
               value={formData.priority}
+              className={`rounded ${
+                formError.priority && "ring-1 ring-red-600"
+              } dark:text-gray-200 dark:bg-gray-800 md:col-span-1 col-span-2`}
             >
               <option value="">-select priority-</option>
               <option value="low">low</option>
@@ -211,14 +191,17 @@ export default function CreateTodoModal({ openModal, setOpenModal }: Prop) {
               Description
             </label>
             <textarea
-            onChange={onchange}
-            value={formData.description}
-            name="description"
+              onChange={onchange}
+              value={formData.description}
+              name="description"
+              className={`rounded ${
+                formError.description && "ring-1 ring-red-600"
+              } dark:text-gray-200 dark:bg-gray-800 col-span-2`}
             />
           </div>
           <button
             type="submit"
-            className="col-span-2 mt-2 bg-purple-900 text-gray-200 h-10 rounded-md"
+            className="col-span-2 mt-2 bg-cyan-700 text-gray-200 h-10 rounded-md"
           >
             CREATE
           </button>
@@ -227,3 +210,4 @@ export default function CreateTodoModal({ openModal, setOpenModal }: Prop) {
     </Modal>
   );
 }
+

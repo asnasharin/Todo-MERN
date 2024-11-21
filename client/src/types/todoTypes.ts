@@ -13,7 +13,7 @@ export interface ITodo {
 
 export interface IMyTodos {
     _id: string;
-    todo: ITodo[];
+    todos: ITodo[];
 }
 
 export interface IinitialState {

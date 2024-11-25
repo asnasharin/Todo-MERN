@@ -1,0 +1,6 @@
+.options {
+  display: none;
+}
+.todo-card:hover .options {
+  display: inline-block;
+}

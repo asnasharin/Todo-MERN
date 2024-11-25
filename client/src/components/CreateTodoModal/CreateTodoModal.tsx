@@ -1,10 +1,10 @@
 import { Modal } from "flowbite-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { ITodo } from "../../types/todoTypes";
-import { validate } from "../../utils/validate";
+import { Itodo } from "../../types/todoTypes";
+import { validate } from "../../utils/FormValidate";
 import toast from "react-hot-toast";
-import { CreateTodo, getAllMyTodos } from "../../services/todoServices";
-import { useAppDispatch } from "../../store/store";
+import { createTodo, getAllMytodos } from "../../servieces/todoServiece";
+import { useAppDispatch } from "../../redux/store";
 
 type Prop = {
   openModal: boolean;
@@ -13,14 +13,14 @@ type Prop = {
 export default function CreateTodoModal({ openModal, setOpenModal }: Prop) {
   const [submit, setSubmit] = useState<boolean>(false);
   const dispatch = useAppDispatch();
-  const [formData, setFormData] = useState<ITodo>({
+  const [formData, setFormData] = useState<Itodo>({
     title: "",
     description: "",
     dueDate: "",
     priority: "",
   });
 
-  const [formError, setFormError] = useState<ITodo>({
+  const [formError, setFormError] = useState<Itodo>({
     title: "",
     description: "",
     dueDate: "",
@@ -101,7 +101,7 @@ export default function CreateTodoModal({ openModal, setOpenModal }: Prop) {
         !formError.dueDate &&
         !formError.priority
       ) {
-        const data = await CreateTodo(formData);
+        const data = await createTodo(formData);
         if (data) {
           toast.success("Todo created");
           setFormData({
@@ -111,7 +111,7 @@ export default function CreateTodoModal({ openModal, setOpenModal }: Prop) {
             priority: "",
           });
           setOpenModal(false);
-          dispatch(getAllMyTodos());
+          dispatch(getAllMytodos());
         }
       }
     })();
@@ -210,4 +210,3 @@ export default function CreateTodoModal({ openModal, setOpenModal }: Prop) {
     </Modal>
   );
 }
-

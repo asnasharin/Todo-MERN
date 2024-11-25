@@ -1,60 +1,41 @@
-import { useState } from "react";
-import CreateTodoModal from "../createTodo/createTodo";
-import { useAppDispatch, useAppSelector } from "../../store/store";
-import { useNavigate } from "react-router-dom";
-import { logout } from "../../features/authSlice";
+import { Dispatch, SetStateAction, useState } from "react";
+import CreateTodoModal from "../CreateTodoModal/CreateTodoModal";
+import UserInfo from "../UserInfo/UserInfo";
+import { useAppSelector } from "../../redux/store";
+import { IMyTodos } from "../../types/todoTypes";
 
-function Sidebar() {
+type prop = {
+  setCurrentTodo: Dispatch<SetStateAction<IMyTodos | undefined>>;
+};
+
+export default function SideBar({ setCurrentTodo }: prop) {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const { todos } = useAppSelector((state) => state.todo);
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-
-  
-
   return (
     <>
       <CreateTodoModal openModal={openModal} setOpenModal={setOpenModal} />
-
-      <div className="w-[300px] h-screen bg-gray-800 text-white flex flex-col">
-        <div className="p-4">
-          <h1 className="text-lg font-bold">Todo App</h1>
+      <div className="w-full flex flex-col items-center justify-between dark:bg-gray-900 dark:border-gray-800 border-gray-300 border-r-2 bg-gray-200 h-full">
+        <div className="h-12 w-full p-2">
+          <button
+            onClick={() => setOpenModal(true)}
+            className="bg-cyan-700 hover:bg-cyan-800 hover:dark:bg-cyan-600 text-gray-200 w-full py-2 rounded-lg font-bold"
+          >
+            Add Todo
+          </button>
         </div>
-
-        <button
-          onClick={() => setOpenModal(true)}
-          className="bg-purple-900 hover:bg-purple-800 text-gray-200 py-2 rounded-lg font-bold m-4"
-        >
-          Add Todo
-        </button>
-
-        <div className="h-[400px] w-full p-2 flex flex-col gap-2 overflow-y-auto items-start justify-start">
-          { todos &&
+        <div className="h-[400px] w-full p-2 flex flex-col  gap-2 overflow-y-auto items-start justify-start">
+          {todos &&
             todos.map((e) => (
               <div
-                key={e._id}
-                className="w-full h-10 bg-slate-300 cursor-pointer text-gray-900 dark:bg-gray-700 dark:text-gray-200 rounded-lg flex flex-shrink-0 items-center justify-center"
+                onClick={() => setCurrentTodo(e)}
+                className="w-full h-10 bg-slate-300 cursor-pointer text-gray-900 dark:bg-gray-700 dark:text-gray-200 rounded-lg flex flex-shrink-0 items-center justify-center "
               >
                 <h1>{e._id.split("-").reverse().join("-")}</h1>
               </div>
-            ))
-          }
+            ))}
         </div>
-
-        <div className="mt-auto p-4">
-          <button
-            onClick={() => {
-              dispatch(logout())
-              navigate("/signin")
-            }}
-            className="bg-red-600 p-2 rounded-md w-full hover:bg-red-700"
-          >
-            Logout
-          </button>
-        </div>
+        <UserInfo />
       </div>
     </>
   );
 }
-
-export default Sidebar;

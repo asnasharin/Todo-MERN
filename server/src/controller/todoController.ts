@@ -1,150 +1,102 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
+import asyncHandler from "express-async-handler";
 import Todo from "../model/todoModel";
+import { IUser } from "../model/userModel";
 
 /**
- * @desc     Create todo
- * @route    POST /api/todo
- * @access   private
+ * @disc    create todo
+ * @route   POST /api/todo
+ * @access  private
  */
-
-export const createTodo = (
-    async (req: Request, res: Response, next: NextFunction) => {
-        const { description, priority, dueDate, title } = req.body
-        const newTodo = await Todo.create({
-            title: title,
-            description: description,
-            dueDate: dueDate,
-            priority: priority,
-            userId: req.user ? req.user._id : "",
-        })
-        if (newTodo) {
-            res.status(200).json({
-              success: true,
-              message: "todo created successfully",
-              todo: newTodo,
-            });
-        }
+export const createTodo: RequestHandler = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { description, dueDate, title, priority } = req.body;
+    const newTodo = await Todo.create({
+      title: title,
+      description: description,
+      dueDate: dueDate,
+      priority: priority,
+      userId: req.user ? req.user._id : "",
+    });
+    if (newTodo) {
+      res.status(200).json({
+        success: true,
+        message: "todo created successfully",
+        todo: newTodo,
+      });
     }
-)
+  }
+);
 
 /**
- * @desc     delete todo
- * @route     DELETE/api/todo/:id
- * @access   private
+ * @disc    create todo
+ * @route   PUT /api/todo/:id
+ * @access  private
  */
-
-export const deleteTodo = (
-    async (req: Request, res: Response, next: NextFunction) => {
-        const { id } = req.params
-
-        const todoDelete = await Todo.findOneAndDelete({ id: id })
-
-        if (todoDelete) {
-            res.status(200).json({
-              success: true,
-              message: "Todo deleted successfully",
-            });
-          }
-    }   
-)
-
-/**
- * @desc     edit todo
- * @route    PUT/api/todo:id
- * @access   private
- */
-
-export const editTodo = (
-    async(req: Request, res: Response) => {
-        const { id, title, description, dueDate, priority} = req.params
-
-        const todo = await Todo.findOneAndUpdate(
-            { id: id},
-            {
-                title: title,
-                description: description,
-                dueDate: dueDate,
-                priority: priority
-            }, 
-            {
-                new: true
-            }
-        )
-
-        if (todo) {
-            res.status(200).json({
-                success: true,
-                message: "todo edited successfully",
-                todo: todo
-            })
-        }
+export const editTodo: RequestHandler = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { description, dueDate, title, priority } = req.body;
+    const updatedTodo = await Todo.findOneAndUpdate(
+      { _id: req.params.id },
+      {
+        title: title,
+        description: description,
+        dueDate: dueDate,
+        priority: priority,
+      },
+      {
+        new: true,
+      }
+    );
+    if (updatedTodo) {
+      res.status(200).json({
+        success: true,
+        message: "todo updated successfully",
+        todo: updatedTodo,
+      });
     }
-)
-
+  }
+);
 
 /**
- * @desc      update todo
- * @route    PATCH/api/todo:id
- * @access   private
+ * @disc    delete todo
+ * @route   DELETE /api/todo/:id
+ * @access  private
  */
+export const deleteTodo: RequestHandler = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const deleteTodo = await Todo.findOneAndDelete({ _id: req.params.id });
+    if (deleteTodo) {
+      res.status(200).json({
+        success: true,
+        message: "Todo deleted successfully",
+      });
+    }
+  }
+);
 
-export const updateTodo = (
-    async (req:Request, res:Response) => {
-       const {id} = req.params
-       const { isCompleted } = req.body
-
-       const updateTodo = await Todo.findOneAndUpdate(
-        { id: id},
-        { isCompleted: isCompleted},
-        { new: true}
-    )
-    if (updateTodo) {
+/**
+ * @disc    update completed
+ * @route   PATCH /api/todo/:id
+ * @access  private
+ */
+export const updateCompleted: RequestHandler = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const todo = await Todo.findOne({ _id: req.params.id });
+    if (!todo) {
+      res.status(404);
+      next(Error("Todo not found"));
+    } else {
+      const updateTodo = await Todo.findOneAndUpdate(
+        { _id: req.params.id },
+        { isCompleted: !todo.isCompleted }
+      );
+      if (updateTodo) {
         res.status(200).json({
-            success: true,
-            message: "Todo updated successfully",
-            todo: updateTodo
-        })
+          success: true,
+          message: "todo updated successfully",
+        });
+      }
     }
-    }
-)
-
-
-/**
- * @desc      fetching all todo
- * @route    GET/api/todo
- * @access   private
- */
-
-export const getTodo = (
-    async (req: Request, res: Response ) => {
-        const userId = req.user?._id
-        const todo = await Todo.aggregate([
-            {
-                $match: {
-                    userId: userId
-                },
-            }, 
-            {
-                $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$dueDate"}},
-                    todo: { $push: "$$ROOT"}
-                },
-            },
-            {
-                $sort: { _id: 1},
-            },
-        ]);
-        if (todo) {
-            res.status(200).json({
-                success: true,
-                todo
-            })
-        } else {
-            res.status(500).send({
-                success: false,
-                message: "internal server error"
-            })
-        }
-    }
-)
-
+  }
+);

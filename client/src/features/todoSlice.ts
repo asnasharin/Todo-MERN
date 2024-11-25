@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { IinitialState } from "../types/todoTypes";
-import { getAllMyTodos } from "../services/todoServices";
+import { getAllMytodos } from "../servieces/todoServiece";
 import { errorMessage } from "../types/authTypes";
 
 const todos = JSON.parse(localStorage.getItem("todos") as string);
@@ -32,16 +32,16 @@ const todoSlice = createSlice({
   },
   extraReducers: (builer) => {
     builer
-      .addCase(getAllMyTodos.pending, (state) => {
+      .addCase(getAllMytodos.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(getAllMyTodos.fulfilled, (state, action) => {
+      .addCase(getAllMytodos.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.todos = action.payload;
-        localStorage.setItem("todos", JSON.stringify(action.payload));
+        state.todos = action.payload.todos;
+        localStorage.setItem("todos", JSON.stringify(action.payload.todos));
       })
-      .addCase(getAllMyTodos.rejected, (state, action) => {
+      .addCase(getAllMytodos.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.error = action.payload as errorMessage;

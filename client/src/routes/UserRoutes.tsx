@@ -1,24 +1,26 @@
-import { Routes, Route  } from "react-router-dom"
-import LoginPage from "../pages/LoginPage/LoginPage"
-import SignupPage from "../pages/SignupPage/SignupPage"
-import HomePage from "../pages/HomePage/HomePage"
-import Authenticate from "../components/Auth/Authenticate"
-import Protect from "../components/Auth/Protect"
+import { Suspense, lazy } from "react";
+import { Route, Routes } from "react-router-dom";
+import Loader1 from "../components/Loader/Loader1/Loader1";
+import Authenticate from "../components/Auth/Authenticate";
+import Protect from "../components/Auth/Protect";
+const LoginPage = lazy(() => import("../pages/LoginPage/LoginPage"));
+const SignupPage = lazy(() => import("../pages/SignupPage/SignupPage"));
+const HomePage = lazy(() => import("../pages/HomePage/HomePage"));
 
-function UserRoutes() {
+export default function UserRoutes() {
   return (
     <>
-    <Routes>
-      <Route element={<Authenticate />} >
-      <Route path="/signin" element={<LoginPage />}/>
-      <Route path="/signup" element={<SignupPage />} />
-      </Route>
-      <Route element={<Protect />}>
-      <Route path="/" element={<HomePage />} />
-      </Route>
-    </Routes>
+      <Suspense fallback={<Loader1 />}>
+        <Routes>
+          <Route element={<Authenticate />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+          </Route>
+          <Route element={<Protect />}>
+            <Route path="/" element={<HomePage />} />
+          </Route>
+        </Routes>
+      </Suspense>
     </>
-  )
+  );
 }
-
-export default UserRoutes

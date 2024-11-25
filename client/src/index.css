@@ -1,3 +1,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: calc(100vw -3px);
+  min-height: calc(100vh - 10px);
+}
+
+
+*::-webkit-scrollbar-track {
+  background: #075e57;
+}
+*::-webkit-scrollbar {
+  background: transparent;
+  width: 5px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #143c5e;
+  border-radius: 20px;
+}

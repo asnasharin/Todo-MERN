@@ -1,32 +1,12 @@
-import express,{ Express, Request, Response } from "express";
-import mongoose from "mongoose"
-import cors from "cors"
-import morgan from "morgan"
-import userRouter from "../src/routes/userRoutes"
-import todoRouter from "../src/routes/todoRoutes"
-import "dotenv/config"
+import app from "./app";
+import { env } from "./utils/envvalid";
+import mongoose from "mongoose";
 
+const PORT = env.PORT || 5000;
 
-const app = express();
-
-const corsConfig = {
-    origin: "*",
-    credentials: true,
-}
-app.use(express.json())
-app.use(express.urlencoded({ extended: true}))
-app.use(cors(corsConfig))
-app.use(morgan("dev"))
-
-app.use("/api", userRouter, todoRouter)
-// app.use("/api/todo", todoRouter)
-
-
-const port = process.env.PORT
-
-mongoose.connect(process.env.MONGO_URI as string).then(() => {
-console.log("db conneted")
-app.listen(port, () => {
-    console.log("server running")
-})
-})
+mongoose.connect(env.MONGO_URI).then(() => {
+  console.log("Database connected successfully");
+  app.listen(PORT, () =>
+    console.log(`server running on port ${PORT}`)
+  );
+});
